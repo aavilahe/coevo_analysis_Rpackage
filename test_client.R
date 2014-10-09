@@ -9,11 +9,11 @@
 #   - aupr
 #   - auc
 
-source('../R/tabIO.R')
-source('../R/utility.R')
-source('../R/pvalues.R')
-source('../R/performance.R')
-
+#source('../R/tabIO.R')
+#source('../R/utility.R')
+#source('../R/pvalues.R')
+#source('../R/performance.R')
+library(coevo)
 
 tabfn = "~/db_projects_aram/PDB_CoevoLearning/BakerGroupData/anal2/1RM6_A_1RM6_B.tab"
 indices = c('Left_Column', 'Right_Column')

@@ -1,0 +1,10 @@
+Package: coevo
+Type: Package
+Title: Assess coevo method performance in cleaned .tab files
+Version: 0.1
+Date: 2014-10-09
+Author: Aram Avila-Herrera
+Maintainer: Aram Avila-Herrera <Aram.Avila-Herrera@ucsf.edu>
+Depends: plyr, pracma, ROCR
+Description: Functions to load .tab files, calculate p-values and classification performance
+License: probably GPL
