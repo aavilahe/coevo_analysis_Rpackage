@@ -56,18 +56,33 @@ cat('making ROCR pred\n')
 pred = getROCRPredObj(clean_r_tab, labels)
 
 targetFPR = 0.01
-cat(paste('cuts controlling fpr at', targetFPR, '\n'))
+cat(paste('cutoff-dependent metrics at targetFPR =', targetFPR, '\n'))
 FPRcuts = getCutoffsThatControlFPR(pred, targetFPR, colnames(r_tab))
-print(FPRcuts)
+TPRatFPR = getTPRAtControlledFPR(pred, targetFPR, colnames(r_tab))
+PPVatFPR = getPPVAtControlledFPR(pred, targetFPR, colnames(r_tab))
+
+RES1 = data.frame(rbind(FPRcuts, TPRatFPR, PPVatFPR))
+print(RES1)
+
+cat('cutoff-indep metrics\n')
+AUC = getCutoffIndependentMetrics(pred, 'auc', colnames(r_tab))
+AUPR = getCutoffIndependentMetrics(pred, 'aupr', colnames(r_tab))
+FMAX = getCutoffIndependentMetrics(pred, 'f', colnames(r_tab))
+PHIMAX = getCutoffIndependentMetrics(pred, 'phi', colnames(r_tab))
+
+RES2 = data.frame(rbind(AUC, AUPR, FMAX, PHIMAX))
+print(RES2)
 
 cat('unflip\n')
-for(i in 1:length(FPRcuts)){
-    column_name = names(FPRcuts[i])
-    if(flipRequired(column_name)){
-        FPRcuts[i] = flip(FPRcuts[i])
+
+for(cn in colnames(RES1)){
+    if(flipRequired(cn)){
+        RES1['FPRcuts', cn] = flip(RES1['FPRcuts', cn])
     }
 }
-print(FPRcuts)
+print(RES1)
+cat('\n\n')
+print(RES2)
 
 
 
