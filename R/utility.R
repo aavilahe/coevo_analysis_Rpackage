@@ -40,6 +40,8 @@ naToBottom = function(x){
 }
 
 cleanColumns = function(tab, column_names){
+    # flip() and naToBottom()
+    # use before calculating p-values and performance
     for(column_name in column_names){
         tmpCol = tab[ , column_name]
         if(flipRequired(column_name)){
@@ -49,10 +51,5 @@ cleanColumns = function(tab, column_names){
     }
     return(tab)
 }
-
-
-
-
-
 
 
