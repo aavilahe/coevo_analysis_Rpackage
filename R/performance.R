@@ -1,7 +1,8 @@
 #R
 # calculate performance with ROCR package
 
-library(ROCR)
+require(ROCR)
+require(pracma)
 
 # cutoffs that control fpr
 
@@ -29,7 +30,7 @@ getTPRAtControlledFPR = function(pred, targetFPR, column_names){
     ntprs = length(perf@y.values)
     tprs = vector(mode = 'numeric', length = ntprs)
     for(i in 1:ntprs){
-        tpr[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
+        tprs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
     }
     names(tprs) = column_names
     return(tprs)
@@ -40,7 +41,7 @@ getPPVAtControlledFPR = function(pred, targetFPR, column_names){
     nprecs = length(perf@y.values)
     precs = vector(mode = 'numeric', length = nprecs)
     for(i in 1:nprecs){
-        prec[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
+        precs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
     }
     names(precs) = column_names
     return(precs)
@@ -62,7 +63,7 @@ getAUPR = function(pred, column_names){
 getMaxMetric = function(pred, metric, column_names){
 	# gets maximum cutoff-dependent metric (f, phi); also works with auc
 	perf = performance(pred, metric)
-    nmet = length(perf@y.values)
+    nmets = length(perf@y.values)
     mets = vector(mode = 'numeric', length = nmets)
     for(i in 1:nmets){
 	    mets[i] = max(perf@y.values[[i]], na.rm=T)
