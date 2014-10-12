@@ -15,12 +15,13 @@
 #source('../R/performance.R')
 library(coevo)
 
-tabfn = "~/db_projects_aram/PDB_CoevoLearning/BakerGroupData/anal2/1RM6_A_1RM6_B.tab"
+#tabfn = "~/db_projects_aram/PDB_CoevoLearning/BakerGroupData/anal2/1RM6_A_1RM6_B.tab"
+tabfn = "~/db_projects_aram/PDB_CoevoLearning/BakerGroupData/anal2/1I1Q_A_1I1Q_B.tab"
 indices = c('Left_Column', 'Right_Column')
 covars = c('Left_Entropy', 'Right_Entropy', 'Joint_Entropy')
 dist_col = 'Dist'
 
-drop_these = c(indices, covars, dist_col)
+drop_these = c(indices, covars, dist_col, 'CoMapP')
 
 
 cat(paste('loading', tabfn, '\n'))
@@ -31,6 +32,9 @@ cat('removing all-NA-columns\n')
 tab = removeAllNAColumns(tab)
 print(dim(tab))
 
+cat('removing Dist-NA-rows\n')
+tab = dropNARowsInCol(tab, dist_col)
+print(dim(tab))
 
 cat('dropping non-score columns\n')
 s_tab = dropColumns(tab, drop_these)  # scores only
@@ -59,9 +63,10 @@ targetFPR = 0.01
 cat(paste('cutoff-dependent metrics at targetFPR =', targetFPR, '\n'))
 FPRcuts = getCutoffsThatControlFPR(pred, targetFPR, colnames(r_tab))
 TPRatFPR = getTPRAtControlledFPR(pred, targetFPR, colnames(r_tab))
+FPRatFPR = getFPRAtControlledFPR(pred, targetFPR, colnames(r_tab))
 PPVatFPR = getPPVAtControlledFPR(pred, targetFPR, colnames(r_tab))
 
-RES1 = data.frame(rbind(FPRcuts, TPRatFPR, PPVatFPR))
+RES1 = data.frame(rbind(FPRcuts, TPRatFPR, FPRatFPR, PPVatFPR))
 print(RES1)
 
 cat('cutoff-indep metrics\n')
