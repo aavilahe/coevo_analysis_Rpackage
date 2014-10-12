@@ -3,11 +3,26 @@
 
 getROCRPredObj = function(cleantab, the_labels){
     # cleantab: data.frame containing predictions
-    # the_labels: vector containing classes (TRUE/FALSE) (eg. data.frame(Labels = c(T, F, T, F)))
-    the_labels = data.frame(matrix(the_labels, length(the_labels), ncol(cleantab), byrow = FALSE))
+    # the_labels: data.frame containing labels (columns should be identical)
     pred = ROCR::prediction(predictions = cleantab, labels = the_labels)
     return(pred)
 }
+
+ROCRprep = function(cleantab, the_labels){
+    # cleantab: data.frame containing predictions
+    # the_labels: vector containing classes (TRUE/FALSE) (eg. data.frame(Labels = c(T, F, T, F)))
+    nonas = !is.na(the_labels)
+
+    the_labels = the_labels[nonas]
+    cleantab = cleantab[nonas, ]
+
+    nr = length(the_labels)
+    nc = ncol(cleantab)
+
+    the_labels = data.frame(matrix(the_labels, nr, nc, byrow = FALSE))
+    return(list('predictions' = cleantab, 'labels' = the_labels))
+}
+
 
 #' cutoffs that control fpr
 getCutoffsThatControlFPR = function(pred, targetFPR, column_names){

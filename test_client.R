@@ -57,7 +57,8 @@ print(dim(clean_r_tab))
 labels = tab[, dist_col] < 8
 
 cat('making ROCR pred\n')
-pred = getROCRPredObj(clean_r_tab, labels)
+ROCRready = ROCRprep(clean_r_tab, labels)
+pred = getROCRPredObj(ROCRready$predictions, ROCRready$labels)
 
 targetFPR = 0.01
 cat(paste('cutoff-dependent metrics at targetFPR =', targetFPR, '\n'))
