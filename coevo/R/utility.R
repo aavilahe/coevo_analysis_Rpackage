@@ -9,7 +9,7 @@ flipRequired = function(column_name){
     if(prefix == 'r_' | prefix == 'z_'){
         return(TRUE)
     }
-    if(column_name %in% c('VI')){
+    if(column_name %in% c('VI', 'CoMapP')){
        return(TRUE)
     }
     return(FALSE)
