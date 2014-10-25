@@ -22,6 +22,7 @@
 #'
 #' @param column_names A character vector of column names.
 #' @return A logical vector indicating if \code{flip()} is required.
+#' @export
 is_flip = function(column_names){
     pnames = grepl("^[rz]_", column_names)
     disnames = colnames %in% c('VI', 'CoMapP')
@@ -37,6 +38,7 @@ is_flip = function(column_names){
 #'
 #' @param x A numeric vector
 #' @return \code{-x}
+#' @export
 flip = function(x){
     return(-x)
 }
@@ -45,6 +47,7 @@ flip = function(x){
 #'
 #' @param tab A data.table
 #' @return A data.table with all-NA columns dropped
+#' @export
 drop_all_NA_columns = function(tab){
     numRows = nrow(tab)
     keepThese = (colSums(is.na(tab)) < numRows)
@@ -56,6 +59,7 @@ drop_all_NA_columns = function(tab){
 #' @param tab A data.table
 #' @param drop_these A character vector of columns to drop
 #' @return A data.table with columns dropped
+#' @export
 drop_columns = function(tab, drop_these){
     return(tab[, !drop_these, with = FALSE])
 }
@@ -65,6 +69,7 @@ drop_columns = function(tab, drop_these){
 #' @param tab A data.table
 #' @param column_names A character vector of column names to check for NAs
 #' @return A data.table with rows dropped
+#' @export
 drop_NA_rows_in_columns = function(tab, column_names){
     return(tab[complete.cases(tab[, column_names, with = FALSE])])
 }
@@ -75,6 +80,7 @@ drop_NA_rows_in_columns = function(tab, column_names){
 #' \code{min(x, na.rm = TRUE)}
 #' @param x A numeric vector
 #' @return A numeric vector with NA values last
+#' @export
 na_to_bottom = function(x){
     xmin = min(x, na.rm = TRUE)
     xmax = max(x, na.rm = TRUE)
@@ -97,6 +103,7 @@ na_to_bottom = function(x){
 #' @param tab A data.table with columns to clean
 #' @return A data.table with finite valued, ascending score columns
 #' @seealso \link{\code{flip()}} and \link{\code{na_to_bottom()}}
+#' @export
 clean_columns = function(tab){
     flip_these = which(is_flip(colnames(tab)))
     flipped = data.table::copy(tab)

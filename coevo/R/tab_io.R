@@ -8,7 +8,7 @@
 #' @examples
 #' load_tab('results.tab')
 #' list_of_tables = lapply(list_of_filenames, load_tab)
-
+#'
 #' @section *.tab file format:
 #' *.tab files are:
 #' \itemize{
@@ -17,6 +17,7 @@
 #'     \item first two columns are alignment column indices
 #'     \item column names do not start with '[r|z]_'
 #' }
+#' @export
 load_tab = function(fn){
     tab = try(
         data.table::fread(fn, header = TRUE, sep = '\t')

@@ -8,6 +8,7 @@
 #' @seealso \link{\code{pred_lab_prep}}
 #' @param pred_lab_list A list with named entries 'predictions' and 'labels'
 #' @return A ROCR::prediction-class object
+#' @export
 get_ROCR_prediction = function(pred_lab_list){
     # cleantab: data.frame containing predictions
     # the_labels: data.frame containing labels (columns should be identical)
@@ -25,6 +26,7 @@ get_ROCR_prediction = function(pred_lab_list){
 #' @param cleantab A data.table that has been cleaned by \code{cleanColumns()}
 #' @param the_labels A logical vector containing the classes for each row
 #' @return A list containing prediction and label data.tables
+#' @export
 pred_lab_prep = function(cleantab, the_labels){
     nonas = !is.na(the_labels)
 
@@ -47,6 +49,7 @@ pred_lab_prep = function(cleantab, the_labels){
 #' @param pred A ROCR prediction object
 #' @param target_FPR A target FPR
 #' @return A numeric vector of score cutoffs ordered like ROCR prediction columns
+#' @export
 get_scores_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'fpr')
     num_cutoffs = length(perf@y.values)
@@ -66,6 +69,7 @@ get_scores_at_FPR = function(pred, target_FPR){
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
 #' @return A numeric vector of TPRs ordered like ROCR prediction columns
+#' @export
 get_TPRs_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'tpr', 'fpr')
     num_tprs = length(perf@y.values)
@@ -84,6 +88,7 @@ get_TPRs_at_FPR = function(pred, target_FPR){
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
 #' @return A numeric vector of nominal FPRs ordered like ROCR prediction columns
+#' @export
 get_nomFPR_at_FPR = function(pred, target_FP){
     perf = ROCR::performance(pred, 'fpr')
     num_fprs = length(perf@y.values)
@@ -103,6 +108,7 @@ get_nomFPR_at_FPR = function(pred, target_FP){
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
 #' @return A numeric vector of PPVs ordered like ROCR prediction columns
+#' @export
 get_PPV_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'ppv', 'fpr')
     num_ppvs = length(perf@y.values)
@@ -118,6 +124,7 @@ get_PPV_at_FPR = function(pred, target_FPR){
 #' Uses ROCR to calculate precision vs recall curve, then calculates area under it.
 #' @param pred A ROCR prediction object
 #' @return A numeric vector of areas under prec-rec curve ordered like ROCR prediction columns
+#' @export
 get_auPR = function(pred){
 	perf = ROCR::performance(pred, 'prec', 'rec')
     num_auprs = length(perf@y.values)
@@ -143,6 +150,7 @@ get_auPR = function(pred){
 #'
 #' @examples
 #' get_max_metric(pred = pred, metric = 'f')  # gets fmax
+#' @export
 get_max_metric = function(pred, metric){
 	perf = ROCR::performance(pred, metric)
     num_mets = length(perf@y.values)
@@ -164,6 +172,7 @@ get_max_metric = function(pred, metric){
 #' @examples
 #' get_cutoff_independent_metric(pred = pred, metric = 'f')  # gets fmax
 #' get_cutoff_independent_metric(pred = pred, metric = 'aupr')  # gets auPR
+#' @export
 get_cutoff_independent_metric = function(pred, metric){
     if(metric == 'aupr'){
         return(get_auPR(pred))
