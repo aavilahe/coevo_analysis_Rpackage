@@ -18,6 +18,7 @@
 #'     \item write p-value tabs
 #' }
 
+library(data.table)
 library(coevo)
 
 # Names, labels, etc...
@@ -77,10 +78,10 @@ setnames(RES1, colnames(r_tab))
 print(RES1)
 
 cat('cutoff-indep metrics\n')
-AUC = getCutoffIndependentMetrics(pred, 'auc', colnames(r_tab))
-AUPR = getCutoffIndependentMetrics(pred, 'aupr', colnames(r_tab))
-FMAX = getCutoffIndependentMetrics(pred, 'f', colnames(r_tab))
-PHIMAX = getCutoffIndependentMetrics(pred, 'phi', colnames(r_tab))
+AUC = get_cutoff_independent_metric(pred, 'auc', colnames(r_tab))
+AUPR = get_cutoff_independent_metric(pred, 'aupr', colnames(r_tab))
+FMAX = get_cutoff_independent_metric(pred, 'f', colnames(r_tab))
+PHIMAX = get_cutoff_independent_metric(pred, 'phi', colnames(r_tab))
 
 RES2 = data.table(rbind(AUC, AUPR, FMAX, PHIMAX))
 setnames(RES2, colnames(r_tab))

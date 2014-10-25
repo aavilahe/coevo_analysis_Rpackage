@@ -27,4 +27,3 @@ load_tab = function(fn){
     }
 	return(tab)
 }
-
