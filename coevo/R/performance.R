@@ -1,24 +1,22 @@
 #' @family calculate performance with ROCR package
 #'
 
-#' Useless wrapper for ROCR::prediction()
+#' Useless wrapper for ROCR::prediction().
 #'
 #' Accepts a single named list of predictions and labels instead.
 #'
-#' @seealso \link{\code{pred_lab_prep}}
 #' @param pred_lab_list A list with named entries 'predictions' and 'labels'
 #' @return A ROCR::prediction-class object
+#' @seealso \link{\code{pred_lab_prep}}
 #' @export
 get_ROCR_prediction = function(pred_lab_list){
-    # cleantab: data.frame containing predictions
-    # the_labels: data.frame containing labels (columns should be identical)
     predictions = pred_lab_list$predictions
     labels = pred_lab_list$labels
     pred = ROCR::prediction(predictions = predictions, labels = labels)
     return(pred)
 }
 
-#' Prepares score data.table and labels for \code{ROCR::prediction()}
+#' Prepares score data.table and labels for \code{ROCR::prediction()}.
 #'
 #' Repeats labels for each column in scores data.table and removes NAs in
 #' labels.
@@ -61,10 +59,10 @@ get_scores_at_FPR = function(pred, target_FPR){
     return(cutoffs)
 }
 
-#' Get TPRs at given FPR
+#' Get TPRs at given FPR.
 #'
 #' Uses ROCR to calculate TPR vs FPR curve, then chooses
-#' largest TPR such that FPR is less than given target rate
+#' largest TPR such that FPR is less than given target rate.
 #'
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
@@ -81,10 +79,11 @@ get_TPRs_at_FPR = function(pred, target_FPR){
     return(tprs)
 }
 
-#' Get nominal FPR at a given target FPR
+#' Get nominal FPR at a given target FPR.
 #'
 #' Uses ROCR to calculate FPR vs score curve, then chooses largest
-#' FPR < target FPR
+#' FPR < target FPR.
+#'
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
 #' @return A numeric vector of nominal FPRs ordered like ROCR prediction columns
@@ -100,10 +99,10 @@ get_nomFPR_at_FPR = function(pred, target_FP){
     return(fprs)
 }
 
-#' Get PPVs at given FPR
+#' Get PPVs at given FPR.
 #'
 #' Uses ROCR to calculate PPV vs FPR curve, then chooses
-#' largest PPV such that FPR is less than given target rate
+#' largest PPV such that FPR is less than given target rate.
 #'
 #' @param pred A ROCR prediction object
 #' @param target_FPR, A target FPR
@@ -119,9 +118,10 @@ get_PPV_at_FPR = function(pred, target_FPR){
     return(ppvs)
 }
 
-#' Get area under the precision-recall curve
+#' Get area under the precision-recall curve.
 #'
 #' Uses ROCR to calculate precision vs recall curve, then calculates area under it.
+#'
 #' @param pred A ROCR prediction object
 #' @return A numeric vector of areas under prec-rec curve ordered like ROCR prediction columns
 #' @export
@@ -136,17 +136,17 @@ get_auPR = function(pred){
 	return(auprs)
 }
 
-#' Get maximum of cutoff-dependent metric
+#' Get maximum of cutoff-dependent metric.
 #'
 #' Calculates ROCR metric vs cutoff curve, and keeps maximum.
-#'
-#' @section Misuse:
-#' Can be misused to calculate auROC when \code{metric = 'auc'},
-#' for example, \link{\code{get_cutoff_independent_metric}}.
 #'
 #' @param pred A ROCR prediction object
 #' @param metric A character string that is one of ROCR's cutoff-dependent performance metrics
 #' @return A numeric vector of metrics ordered like ROCR prediction columns
+#'
+#' @section Misuse:
+#' Can be misused to calculate auROC when \code{metric = 'auc'},
+#' for example, \link{\code{get_cutoff_independent_metric}}.
 #'
 #' @examples
 #' get_max_metric(pred = pred, metric = 'f')  # gets fmax
@@ -161,7 +161,7 @@ get_max_metric = function(pred, metric){
 	return(mets)
 }
 
-#' Get cutoff-independent metric
+#' Get cutoff-independent metric.
 #'
 #' Calculates cutoff-independent metric using ROCR, for example
 #' \code{auc}, \code{aupr}, \code{mccmax}, \code{fmax}.
