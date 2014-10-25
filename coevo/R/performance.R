@@ -5,7 +5,7 @@
 #'
 #' Accepts a single named list of predictions and labels instead.
 #'
-#' @seealso \link{\code{prepare_predictions_and_labels}}
+#' @seealso \link{\code{pred_lab_prep}}
 #' @param pred_lab_list A list with named entries 'predictions' and 'labels'
 #' @return A ROCR::prediction-class object
 get_ROCR_prediction = function(pred_lab_list){
@@ -25,7 +25,7 @@ get_ROCR_prediction = function(pred_lab_list){
 #' @param cleantab A data.table that has been cleaned by \code{cleanColumns()}
 #' @param the_labels A logical vector containing the classes for each row
 #' @return A list containing prediction and label data.tables
-prepare_predictions_and_labels = function(cleantab, the_labels){
+pred_lab_prep = function(cleantab, the_labels){
     nonas = !is.na(the_labels)
 
     the_labels = the_labels[nonas]

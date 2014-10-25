@@ -6,7 +6,7 @@
 #'      \item \code{\link{flip}}
 #'      \item \code{\link{drop_all_NA_columns}}
 #'      \item \code{\link{drop_columns}}
-#'      \item \code{\link{drop_na_rows_in_col}}
+#'      \item \code{\link{drop_NA_rows_in_col}}
 #'      \item \code{\link{na_to_bottom}}
 #'      \item \code{\link{clean_columns}}
 #' }
