@@ -4,11 +4,11 @@
 #' @seealso \itemize{
 #'      \item \code{\link{is_flip}}
 #'      \item \code{\link{flip}}
-#'      \item \code{\link{dropAllNAColumns}}
-#'      \item \code{\link{dropColumns}}
-#'      \item \code{\link{dropNARowsInCol}}
-#'      \item \code{\link{naToBottom}}
-#'      \item \code{\link{cleanColumns}}
+#'      \item \code{\link{drop_all_NA_columns}}
+#'      \item \code{\link{drop_columns}}
+#'      \item \code{\link{drop_na_rows_in_col}}
+#'      \item \code{\link{na_to_bottom}}
+#'      \item \code{\link{clean_columns}}
 #' }
 
 
@@ -41,11 +41,11 @@ flip = function(x){
     return(-x)
 }
 
-#' Drop columns that are all NA
+#' Drops columns that are all NA
 #'
 #' @param tab A data.table
 #' @return A data.table with all-NA columns dropped
-dropAllNAColumns = function(tab){
+drop_all_NA_columns = function(tab){
     numRows = nrow(tab)
     keepThese = (colSums(is.na(tab)) < numRows)
     return(tab[, keepThese])
@@ -56,7 +56,7 @@ dropAllNAColumns = function(tab){
 #' @param tab A data.table
 #' @param drop_these A character vector of columns to drop
 #' @return A data.table with columns dropped
-dropColumns = function(tab, drop_these){
+drop_columns = function(tab, drop_these){
     return(tab[, !drop_these, with = FALSE])
 }
 
@@ -65,7 +65,7 @@ dropColumns = function(tab, drop_these){
 #' @param tab A data.table
 #' @param column_names A character vector of column names to check for NAs
 #' @return A data.table with rows dropped
-dropNARowsInCol = function(tab, column_names){
+drop_NA_rows_in_columns = function(tab, column_names){
     return(tab[complete.cases(tab[, column_names, with = FALSE])])
 }
 
@@ -75,7 +75,7 @@ dropNARowsInCol = function(tab, column_names){
 #' \code{min(x, na.rm = TRUE)}
 #' @param x A numeric vector
 #' @return A numeric vector with NA values last
-naToBottom = function(x){
+na_to_bottom = function(x){
     xmin = min(x, na.rm = TRUE)
     xmax = max(x, na.rm = TRUE)
     xrange = xmax - xmin 
@@ -87,7 +87,7 @@ naToBottom = function(x){
 
 #' Flip and handle NAs in data.table columns
 #'
-#' \code{cleanColumns} checks columns by column name
+#' \code{clean_columns} checks columns by column name
 #' to determine if flipping big and small values is
 #' required, then \code{flip()}s those columns.
 #'
@@ -96,12 +96,12 @@ naToBottom = function(x){
 #'
 #' @param tab A data.table with columns to clean
 #' @return A data.table with finite valued, ascending score columns
-#' @seealso \link{\code{flip()}} and \link{\code{naToBottom()}}
-cleanColumns = function(tab){
+#' @seealso \link{\code{flip()}} and \link{\code{na_to_bottom()}}
+clean_columns = function(tab){
     flip_these = which(is_flip(colnames(tab)))
     flipped = data.table::copy(tab)
     flipped[, (flip_these) := lapply(.SD, flip), .SDcols = flip_these]
-    cleaned = flipped[, lapply(.SD, naToBottom)]
+    cleaned = flipped[, lapply(.SD, na_to_bottom)]
     return(cleaned)
 }
 
