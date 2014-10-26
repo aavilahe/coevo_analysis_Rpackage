@@ -28,3 +28,20 @@ load_tab = function(fn){
     }
 	return(tab)
 }
+
+#' Saves a data.table or data.frame as an unquoted tsv
+#'
+#' Wrapper for \code{write.table()}, does not save row.names,
+#' and prints floats to 6 significant digits
+#'
+#' @param tab A data.table (or data.frame) to save
+#' @param fn Filename to write to
+#' @return Whatever \code{write.table()} returns
+#'
+#' @export
+save_tab = function(tab, fn){
+    write.table(format(tab, digits = 6), fn, sep = '\t',
+                row.names = FALSE,
+                quote = FALSE)
+}
+
