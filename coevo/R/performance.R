@@ -1,16 +1,33 @@
-#R
-# calculate performance with ROCR package
+#' Functions for calculating performance with ROCR package
 
-getROCRPredObj = function(cleantab, the_labels){
-    # cleantab: data.frame containing predictions
-    # the_labels: data.frame containing labels (columns should be identical)
-    pred = ROCR::prediction(predictions = cleantab, labels = the_labels)
+
+#' Useless wrapper for ROCR::prediction().
+#'
+#' Accepts a single named list of predictions and labels instead.
+#'
+#' @param pred_lab_list A list with named entries 'predictions' and 'labels'
+#' @return A ROCR::prediction-class object
+#' @seealso \link{\code{pred_lab_prep}}
+#'
+#' @export
+get_ROCR_prediction = function(pred_lab_list){
+    predictions = pred_lab_list$predictions
+    labels = pred_lab_list$labels
+    pred = ROCR::prediction(predictions = predictions, labels = labels)
     return(pred)
 }
 
-ROCRprep = function(cleantab, the_labels){
-    # cleantab: data.frame containing predictions
-    # the_labels: vector containing classes (TRUE/FALSE) (eg. data.frame(Labels = c(T, F, T, F)))
+#' Prepares score data.table and labels for \code{ROCR::prediction()}.
+#'
+#' Repeats labels for each column in scores data.table and removes NAs in
+#' labels.
+#'
+#' @param cleantab A data.table that has been cleaned by \code{cleanColumns()}
+#' @param the_labels A logical vector containing the classes for each row
+#' @return A list containing prediction and label data.tables
+#'
+#' @export
+pred_lab_prep = function(cleantab, the_labels){
     nonas = !is.na(the_labels)
 
     the_labels = the_labels[nonas]
@@ -19,85 +36,155 @@ ROCRprep = function(cleantab, the_labels){
     nr = length(the_labels)
     nc = ncol(cleantab)
 
-    the_labels = data.frame(matrix(the_labels, nr, nc, byrow = FALSE))
+    the_labels = as.data.table(matrix(the_labels, nr, nc, byrow = FALSE))
     return(list('predictions' = cleantab, 'labels' = the_labels))
 }
 
 
-#' cutoffs that control fpr
-getCutoffsThatControlFPR = function(pred, targetFPR, column_names){
+#' Get score cutoffs that control FPR below a given target rate.
+#'
+#' Uses ROCR to calculate FPR vs score cutoff curve, then chooses
+#' largest score such that FPR is less than given target rate.
+#'
+#' @param pred A ROCR prediction object
+#' @param target_FPR A target FPR
+#' @return A numeric vector of score cutoffs ordered like ROCR prediction columns
+#'
+#' @export
+get_scores_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'fpr')
-    ncutoffs = length(perf@y.values)
-    cutoffs = vector(mode = 'numeric', length = ncutoffs)
-    for(i in 1:ncutoffs){
-        cutoffs[i] = tail(perf@x.values[[i]][perf@y.values[[i]] < targetFPR], 1)
+    num_cutoffs = length(perf@y.values)
+    cutoffs = vector(mode = 'numeric', length = num_cutoffs)
+    for(i in 1:num_cutoffs){
+        # get last x of (x,y) where y < target_FPR
+        cutoffs[i] = tail(perf@x.values[[i]][perf@y.values[[i]] < target_FPR], 1)
     }
-    names(cutoffs) = column_names
     return(cutoffs)
 }
 
-getTPRAtControlledFPR = function(pred, targetFPR, column_names){
+#' Get TPRs at given FPR.
+#'
+#' Uses ROCR to calculate TPR vs FPR curve, then chooses
+#' largest TPR such that FPR is less than given target rate.
+#'
+#' @param pred A ROCR prediction object
+#' @param target_FPR, A target FPR
+#' @return A numeric vector of TPRs ordered like ROCR prediction columns
+#'
+#' @export
+get_TPRs_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'tpr', 'fpr')
-    ntprs = length(perf@y.values)
-    tprs = vector(mode = 'numeric', length = ntprs)
-    for(i in 1:ntprs){
-        tprs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
+    num_tprs = length(perf@y.values)
+    tprs = vector(mode = 'numeric', length = num_tprs)
+    for(i in 1:num_tprs){
+        # get last y of (x,y) where x < target_FPR
+        tprs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < target_FPR], 1)
     }
-    names(tprs) = column_names
     return(tprs)
 }
 
-getFPRAtControlledFPR = function(pred, targetFPR, column_names){
+#' Get nominal FPR at a given target FPR.
+#'
+#' Uses ROCR to calculate FPR vs score curve, then chooses largest
+#' FPR < target FPR.
+#'
+#' @param pred A ROCR prediction object
+#' @param target_FPR, A target FPR
+#' @return A numeric vector of nominal FPRs ordered like ROCR prediction columns
+#'
+#' @export
+get_nomFPR_at_FPR = function(pred, target_FP){
     perf = ROCR::performance(pred, 'fpr')
-    nfprs = length(perf@y.values)
-    fprs = vector(mode = 'numeric', length = nfprs)
-    for(i in 1:nfprs){
-        fprs[i] = tail(perf@y.values[[i]][perf@y.values[[i]] < targetFPR], 1)
+    num_fprs = length(perf@y.values)
+    fprs = vector(mode = 'numeric', length = num_fprs)
+    for(i in 1:num_fprs){
+        # get last y of (x,y) where y < target_FPR
+        fprs[i] = tail(perf@y.values[[i]][perf@y.values[[i]] < target_FPR], 1)
     }
-    names(fprs) = column_names
     return(fprs)
 }
 
-getPPVAtControlledFPR = function(pred, targetFPR, column_names){
-    perf = ROCR::performance(pred, 'prec', 'fpr')
-    nprecs = length(perf@y.values)
-    precs = vector(mode = 'numeric', length = nprecs)
-    for(i in 1:nprecs){
-        precs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < targetFPR], 1)
+#' Get PPVs at given FPR.
+#'
+#' Uses ROCR to calculate PPV vs FPR curve, then chooses
+#' largest PPV such that FPR is less than given target rate.
+#'
+#' @param pred A ROCR prediction object
+#' @param target_FPR, A target FPR
+#' @return A numeric vector of PPVs ordered like ROCR prediction columns
+#'
+#' @export
+get_PPV_at_FPR = function(pred, target_FPR){
+    perf = ROCR::performance(pred, 'ppv', 'fpr')
+    num_ppvs = length(perf@y.values)
+    ppvs = vector(mode = 'numeric', length = num_ppvs)
+    for(i in 1:num_ppvs){
+        ppvs[i] = tail(perf@y.values[[i]][perf@x.values[[i]] < target_FPR], 1)
     }
-    names(precs) = column_names
-    return(precs)
+    return(ppvs)
 }
 
-getAUPR = function(pred, column_names){
-	# computes area under precision recall curve for column_names
+#' Get area under the precision-recall curve.
+#'
+#' Uses ROCR to calculate precision vs recall curve, then calculates area under it.
+#'
+#' @param pred A ROCR prediction object
+#' @return A numeric vector of areas under prec-rec curve ordered like ROCR prediction columns
+#'
+#' @export
+get_auPR = function(pred){
 	perf = ROCR::performance(pred, 'prec', 'rec')
-    nauprs = length(perf@y.values)
-    auprs = vector(mode = 'numeric', length = nauprs)
-    for(i in 1:nauprs){
+    num_auprs = length(perf@y.values)
+    auprs = vector(mode = 'numeric', length = num_auprs)
+    for(i in 1:num_auprs){
 	    perf.mat = na.omit(cbind(perf@x.values[[i]], perf@y.values[[i]]))
 	    auprs[i] = pracma::trapz(perf.mat[,1], perf.mat[,2])
     }
-    names(auprs) = column_names
 	return(auprs)
 }
 
-getMaxMetric = function(pred, metric, column_names){
-	# gets maximum cutoff-dependent metric (f, phi); also works with auc
+#' Get maximum of cutoff-dependent metric.
+#'
+#' Calculates ROCR metric vs cutoff curve, and keeps maximum.
+#'
+#' @param pred A ROCR prediction object
+#' @param metric A character string that is one of ROCR's cutoff-dependent performance metrics
+#' @return A numeric vector of metrics ordered like ROCR prediction columns
+#'
+#' @section Misuse:
+#' Can be misused to calculate auROC when \code{metric = 'auc'},
+#' for example, \link{\code{get_cutoff_independent_metric}}.
+#'
+#' @examples
+#' get_max_metric(pred = pred, metric = 'f')  # gets fmax
+#'
+#' @export
+get_max_metric = function(pred, metric){
 	perf = ROCR::performance(pred, metric)
-    nmets = length(perf@y.values)
-    mets = vector(mode = 'numeric', length = nmets)
-    for(i in 1:nmets){
+    num_mets = length(perf@y.values)
+    mets = vector(mode = 'numeric', length = num_mets)
+    for(i in 1:num_mets){
 	    mets[i] = max(perf@y.values[[i]], na.rm=T)
     }
-    names(mets) = column_names
 	return(mets)
 }
 
-getCutoffIndependentMetrics = function(pred, metric, column_names){
-    # auc, aupr, (f, phi --> max f, max phi)
+#' Get cutoff-independent metric.
+#'
+#' Calculates cutoff-independent metric using ROCR, for example
+#' \code{auc}, \code{aupr}, \code{mccmax}, \code{fmax}.
+#'
+#' @param pred A ROCR prediction object
+#' @param metric a character string that is one of ROCR's performance metrics
+#'
+#' @examples
+#' get_cutoff_independent_metric(pred = pred, metric = 'f')  # gets fmax
+#' get_cutoff_independent_metric(pred = pred, metric = 'aupr')  # gets auPR
+#'
+#' @export
+get_cutoff_independent_metric = function(pred, metric){
     if(metric == 'aupr'){
-        return(getAUPR(pred, column_names))
+        return(get_auPR(pred))
     }
-    return(getMaxMetric(pred, metric, column_names))
+    return(get_max_metric(pred, metric))
 }
