@@ -1,24 +1,23 @@
-#' @family p-value calculating functions
-#'
-#' These functions calculate p-values for coevolution
-#' scores assuming they come from the null distribution
-#' or a given theoretical distribution.
-#' @seealso \itemize{
-#'      \item \code{\link{p_empirical}}
-#'      \item \code{\link{p_normal}}
-#'      \item \code{\link{p_gamma}}
-#' }
+# P-value calculating functions
+#
+# These functions calculate p-values for coevolution
+# scores assuming they come from the null distribution
+# or a given theoretical distribution.
+#   p_empirical
+#   p_normal
+#   p_gamma
 
 #' P-values given standard normal null
 #'
 #' \code{p_normal} computes p-values for coevolution scores
-#' assuming the null distribution is \code{N(\mu = 0,\sigma = 1)}
+#' assuming the null distribution is \code{N($\mu$ = 0,$\sigma$ = 1)}
 #'
 #' @param x A numeric vector of finite valued coevolution scores
 #' @return A numeric vector of p-values
 #' @section Usage note:
 #' \code{p_normal(x)} assumes high values are good scores
 #' and \code{x} is finite valued (eg. no NAs, NaNs)
+#'
 #' @export
 p_normal = function(x){
     z_x = scale(x)
@@ -36,6 +35,7 @@ p_normal = function(x){
 #' @section Usage note:
 #' \code{p_empirical(x)} assumes high values are good scores
 #' and \code{x} is finite valued (eg. no NAs, NaNs)
+#'
 #' @export
 p_empirical = function(x){
     p_x = 1 - ecdf(x)(x)
@@ -52,6 +52,7 @@ p_empirical = function(x){
 #' @param pfunc An R function that calculates p-values from scores
 #' @param prefix A character string prepended to score names used to name p-value columns
 #' @return A data.table containing p-values for given scores from \code{stab}.
+#'
 #' @export
 calculate_p = function(stab, pfunc, prefix){
     snames = colnames(stab)

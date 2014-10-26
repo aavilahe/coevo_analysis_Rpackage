@@ -1,5 +1,4 @@
-#' @family tab loading functions
-#' @seealso \code{\link{load_tab}}
+# tab loading functions
 
 #' Reads a *.tab formatted file and returns a data.table.
 #'
@@ -17,12 +16,13 @@
 #'     \item first two columns are alignment column indices
 #'     \item column names do not start with '[r|z]_'
 #' }
+#'
 #' @export
 load_tab = function(fn){
     tab = try(
         data.table::fread(fn, header = TRUE, sep = '\t')
     )
-    if(class(tab) == 'try-error'){
+    if(any('try-error' %in% class(tab))){
         warning(paste('load_tab: Read no lines from', fn))
         return(NULL)
     }
