@@ -39,7 +39,7 @@ tab = drop_all_NA_columns(tab)
 print(dim(tab))
 
 cat('removing Dist-NA-rows\n')  # partially redundant with pred_lab_prep()
-tab = drop_NA_rows_in_col(tab, dist_col)
+tab = drop_NA_rows_in_columns(tab, dist_col)
 print(dim(tab))
 
 cat('dropping non-score columns\n')
@@ -60,7 +60,7 @@ print(dim(z_tab))
 cat('cleaning r_tab for ROCR\n')
 clean_r_tab = clean_columns(r_tab)
 print(dim(clean_r_tab))
-labels = tab[, dist_col, with = FALSE] < 8
+labels = tab[[dist_col]] < 8
 
 cat('making ROCR pred on empirical p-values\n')
 pred_lab = pred_lab_prep(clean_r_tab, labels)
@@ -73,30 +73,32 @@ TPRatFPR = get_TPRs_at_FPR(pred, target_FPR)
 FPRatFPR = get_nomFPR_at_FPR(pred, target_FPR)
 PPVatFPR = get_PPV_at_FPR(pred, target_FPR)
 
-RES1 = data.table(rbind(FPRcuts, TPRatFPR, FPRatFPR, PPVatFPR))
-setnames(RES1, colnames(r_tab))
+RES1 = data.table(rbind(FPRcuts, TPRatFPR, FPRatFPR, PPVatFPR), keep.rownames = TRUE)
+setnames(RES1, c('Metric', colnames(r_tab)))
 print(RES1)
 
 cat('cutoff-indep metrics\n')
-AUC = get_cutoff_independent_metric(pred, 'auc', colnames(r_tab))
-AUPR = get_cutoff_independent_metric(pred, 'aupr', colnames(r_tab))
-FMAX = get_cutoff_independent_metric(pred, 'f', colnames(r_tab))
-PHIMAX = get_cutoff_independent_metric(pred, 'phi', colnames(r_tab))
+AUC = get_cutoff_independent_metric(pred, 'auc')
+AUPR = get_cutoff_independent_metric(pred, 'aupr')
+FMAX = get_cutoff_independent_metric(pred, 'f')
+PHIMAX = get_cutoff_independent_metric(pred, 'phi')
 
-RES2 = data.table(rbind(AUC, AUPR, FMAX, PHIMAX))
-setnames(RES2, colnames(r_tab))
+RES2 = data.table(rbind(AUC, AUPR, FMAX, PHIMAX), keep.rownames = TRUE)
+setnames(RES2, c('Metric', colnames(r_tab)))
 print(RES2)
 
 cat('unflip\n')
-unflip_these = is_flip(colnames(RES1))
-RES1[, (unflip_these) := lapply(.SD, flip), .SDcols = unflip_these]
+unflip_these = which(is_flip(colnames(RES1)))
+RES1[ Metric == 'FPRcuts', (unflip_these) := lapply(.SD, flip), .SDcols = unflip_these]
 
 print(RES1)
 
 
 # save r_tab, z_tab with indices, covars, and distances
 
-r_ctab = cbind(tab[, c(drop_these)], r_tab)
-z_ctab = cbind(tab[, c(drop_these)], z_tab)
+r_ctab = cbind(tab[, drop_these, with = FALSE], r_tab)
+z_ctab = cbind(tab[, drop_these, with = FALSE], z_tab)
 
+save_tab(r_ctab, 'r_ctab')
+save_tab(z_ctab, 'z_ctab')
 
