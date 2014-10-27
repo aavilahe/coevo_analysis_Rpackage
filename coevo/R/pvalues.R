@@ -10,7 +10,7 @@
 #' P-values given standard normal null
 #'
 #' \code{p_normal} computes p-values for coevolution scores
-#' assuming the null distribution is \code{N($\mu$ = 0,$\sigma$ = 1)}
+#' assuming the null distribution is \eqn{N(\mu = 0, \sigma = 1)}
 #'
 #' @param x A numeric vector of finite valued coevolution scores
 #' @return A numeric vector of p-values
