@@ -93,7 +93,7 @@ get_TPR_at_FPR = function(pred, target_FPR){
 #' @return A numeric vector of nominal FPRs ordered like ROCR prediction columns
 #'
 #' @export
-get_nomFPR_at_FPR = function(pred, target_FP){
+get_nomFPR_at_FPR = function(pred, target_FPR){
     perf = ROCR::performance(pred, 'fpr')
     num_fprs = length(perf@y.values)
     fprs = vector(mode = 'numeric', length = num_fprs)
