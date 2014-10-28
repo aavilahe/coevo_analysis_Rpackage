@@ -69,7 +69,7 @@ pred = get_ROCR_prediction(pred_lab)
 target_FPR = 0.01
 cat(paste('cutoff-dependent metrics at target_FPR =', target_FPR, '\n'))
 FPRcuts = get_scores_at_FPR(pred, target_FPR)
-TPRatFPR = get_TPRs_at_FPR(pred, target_FPR)
+TPRatFPR = get_TPR_at_FPR(pred, target_FPR)
 FPRatFPR = get_nomFPR_at_FPR(pred, target_FPR)
 PPVatFPR = get_PPV_at_FPR(pred, target_FPR)
 
