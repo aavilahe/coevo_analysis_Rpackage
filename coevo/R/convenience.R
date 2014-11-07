@@ -11,8 +11,7 @@
 #' @return A santized tab ready to work with.
 #'
 #' @export
-load_sanitized = function(fn, non_score_names = character(0),
-                          essential_names = character(0)){
+load_sanitized = function(fn, essential_names = character(0)){
     tab = load_tab(fn)
     tab = drop_all_NA_columns(tab)
     tab = drop_NA_rows_in_columns(tab, essential_names)
