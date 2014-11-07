@@ -24,8 +24,9 @@
 #' @export
 is_flip = function(column_names){
     pnames = grepl("^[rz]_", column_names)
-    disnames = column_names %in% c('VI', 'CoMapP')
-    flip_these = pnames | disnames
+    vis = grepl("^VI", column_names)
+    comapPs = grepl("^CoMapP", column_names)
+    flip_these = pnames | vis | comapPs
     return(flip_these)
 }
 
@@ -63,6 +64,7 @@ drop_all_NA_columns = function(tab){
 #'
 #' @export
 drop_columns = function(tab, drop_these){
+    #return(tab[, names(tab) %ni% drop_these, with = FALSE])
     return(tab[, !drop_these, with = FALSE])
 }
 
