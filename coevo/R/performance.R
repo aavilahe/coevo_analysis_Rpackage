@@ -56,8 +56,18 @@ get_scores_at_FPR = function(pred, target_FPR){
     num_cutoffs = length(perf@y.values)
     cutoffs = vector(mode = 'numeric', length = num_cutoffs)
     for(i in 1:num_cutoffs){
+        ### inclusive cutoffs
         # get last x of (x,y) where y < target_FPR
-        cutoffs[i] = tail(perf@x.values[[i]][perf@y.values[[i]] < target_FPR], 1)
+        #cutoffs[i] = tail(perf@x.values[[i]][perf@y.values[[i]] < target_FPR], 1)
+        
+        ### exclusive cutoffs
+        # get -Inf or x after last x of (x,y) where y < target_FPR
+        w = tail(which(perf@y.values[[i]] < target_FPR), 1)
+        if(w == length(perf@x.values[[i]])){
+            cutoffs[i] = -Inf
+        } else {
+            cutoffs[i] = perf@x.values[[i]][w + 1]
+        }
     }
     return(cutoffs)
 }
