@@ -77,6 +77,18 @@ RES1 = data.table(rbind(FPRcuts, TPRatFPR, FPRatFPR, PPVatFPR), keep.rownames = 
 setnames(RES1, c('Metric', colnames(r_tab)))
 print(RES1)
 
+target_p = 0.01
+cat(paste('cutoff-dependent metrics at target_p =', target_p, '\n'))
+Pcuts = get_P_at_p(pred, target_p)
+TPRatP = get_TPR_at_p(pred, target_p)
+FPRatP = get_FPR_at_p(pred, target_p)
+PPVatP = get_PPV_at_p(pred, target_p)
+
+RES3 = data.table(rbind(Pcuts, TPRatP, FPRatP, PPVatP), keep.rownames = TRUE)
+setnames(RES3, c('Metric', colnames(r_tab)))
+print(RES3)
+
+
 cat('cutoff-indep metrics\n')
 AUC = get_cutoff_independent_metric(pred, 'auc')
 AUPR = get_cutoff_independent_metric(pred, 'aupr')
@@ -90,8 +102,11 @@ print(RES2)
 cat('unflip\n')
 unflip_these = which(is_flip(colnames(RES1)))
 RES1[ Metric == 'FPRcuts', (unflip_these) := lapply(.SD, flip), .SDcols = unflip_these]
-
 print(RES1)
+
+unflip_these = which(is_flip(colnames(RES3)))
+RES3[ Metric == 'Pcuts', (unflip_these) := lapply(.SD, flip), .SDcols = unflip_these]
+print(RES3)
 
 
 # save r_tab, z_tab with indices, covars, and distances
@@ -101,4 +116,3 @@ z_ctab = cbind(tab[, drop_these, with = FALSE], z_tab)
 
 save_tab(r_ctab, 'r_ctab')
 save_tab(z_ctab, 'z_ctab')
-
