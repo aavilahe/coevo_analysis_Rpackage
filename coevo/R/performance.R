@@ -40,6 +40,83 @@ pred_lab_prep = function(cleantab, the_labels){
     return(list('predictions' = cleantab, 'labels' = the_labels))
 }
 
+#' Get TPR at target cutoff
+#'
+#' Uses ROCR to calculate TPR vs p cutoff curve, then
+#' chooses largest TPR for ps stricter than given target p cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_p A target p
+#' @return A numeric vector of TPRs ordered like ROCR prediction columns
+#' @export
+get_TPR_at_p = function(pred, target_p){
+    target_p = coevo::flip(target_p)
+    perf = ROCR::performance(pred, 'tpr')
+    num_tprs = length(perf@y.values)
+    tprs = vector(mode = 'numeric', length = num_tprs)
+    for(i in 1:num_tprs){
+        w = tail(which(perf@x.values[[i]] > target_p), 1)
+        tprs[i] = perf@y.values[[i]][w]
+    }
+    return(tprs)
+}
+
+#' Get PPV at target cutoff
+#'
+#' Uses ROCR to calculate PPV vs p cutoff curve, then
+#' chooses largest PPV for ps stricter than given target p cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_p A target p
+#' @return A numeric vector of PPVs ordered like ROCR prediction columns
+#' @export
+get_PPV_at_p = function(pred, target_p){
+    target_p = coevo::flip(target_p)
+    perf = ROCR::performance(pred, 'ppv')
+    num_ppvs = length(perf@y.values)
+    ppvs = vector(mode = 'numeric', length = num_ppvs)
+    for(i in 1:num_ppvs){
+        w = tail(which(perf@x.values[[i]] > target_p), 1)
+        ppvs[i] = perf@y.values[[i]][w]
+    }
+    return(ppvs)
+}
+
+#' Get FPR at target cutoff
+#'
+#' Uses ROCR to calculate FPR vs p cutoff curve, then
+#' chooses largest FPR for ps stricter than given target p cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_p A target p
+#' @return A numeric vector of FPRs ordered like ROCR prediction columns
+#' @export
+get_FPR_at_p = function(pred, target_p){
+    target_p = coevo::flip(target_p)
+    perf = ROCR::performance(pred, 'fpr')
+    num_fprs = length(perf@y.values)
+    fprs = vector(mode = 'numeric', length = num_fprs)
+    for(i in 1:num_fprs){
+        w = tail(which(perf@x.values[[i]] > target_p), 1)
+        fprs[i] = perf@y.values[[i]][w]
+    }
+    return(fprs)
+}
+
+#' Get p at target cutoff
+#'
+#' Uses ROCR to calculate FPR vs p cutoff curve, then
+#' chooses loosest p looser than target_p
+#'
+#' @param pred A ROCR prediction object
+#' @param target_p A target p
+#' @return A numeric vector of FPRs ordered like ROCR prediction columns
+#' @export
+get_P_at_p = function(pred, target_p){
+    target_p = coevo::flip(target_p)
+    ps = sapply(pred@cutoffs, function(X){ min(X[X > target_p])})
+    return(ps)
+}
 
 #' Get score cutoffs that control FPR below a given target rate.
 #'
