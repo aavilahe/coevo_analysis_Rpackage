@@ -26,7 +26,8 @@ is_flip = function(column_names){
     pnames = grepl("^[rz]_", column_names)
     vis = grepl("^VI", column_names)
     comapPs = grepl("^CoMapP", column_names)
-    flip_these = pnames | vis | comapPs
+    comapPs_alt = grepl("^CMP", column_names)  # adds alternate name for comap
+    flip_these = pnames | vis | comapPs | comapPs_alt  # pypackage commit: 84aff1f5b94554567068f16b3f57c413fba569a3
     return(flip_these)
 }
 
