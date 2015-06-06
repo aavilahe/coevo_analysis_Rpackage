@@ -63,9 +63,23 @@ calculate_p = function(stab, pfunc, prefix){
     return(ptab)
 }
 
+#' P-values given specific null score distribution
+#'
+#' \code{p_null} returns a function for computing empirical p-values
+#' given a specific null score distribution
+#'
+#' @param x A numeric vector of finite valued coevolution scores
+#' @return A function for computing p-values
+#' @section Usage note:
+#' Assumes high values are good scores and \code{x} is finite valued (eg. no NAs, NaNs)
+#'
+#' @export
+p_null = function(x){
+    e = ecdf(x)
+    f = function(y){
+        p_x = 1 - e(y)
+        return(p_x)
+    }
+    return(f)
+}
 
-
-
-
-
-    
