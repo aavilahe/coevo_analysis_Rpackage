@@ -40,7 +40,7 @@ pred_lab_prep = function(cleantab, the_labels){
     return(list('predictions' = cleantab, 'labels' = the_labels))
 }
 
-#' Get TPR at target cutoff
+#' Get TPR at target p cutoff
 #'
 #' Uses ROCR to calculate TPR vs p cutoff curve, then
 #' chooses largest TPR for ps stricter than given target p cutoff
@@ -61,7 +61,7 @@ get_TPR_at_p = function(pred, target_p){
     return(tprs)
 }
 
-#' Get PPV at target cutoff
+#' Get PPV at target p cutoff
 #'
 #' Uses ROCR to calculate PPV vs p cutoff curve, then
 #' chooses largest PPV for ps stricter than given target p cutoff
@@ -82,7 +82,7 @@ get_PPV_at_p = function(pred, target_p){
     return(ppvs)
 }
 
-#' Get FPR at target cutoff
+#' Get FPR at target p cutoff
 #'
 #' Uses ROCR to calculate FPR vs p cutoff curve, then
 #' chooses largest FPR for ps stricter than given target p cutoff
@@ -103,7 +103,7 @@ get_FPR_at_p = function(pred, target_p){
     return(fprs)
 }
 
-#' Get p at target cutoff
+#' Get p at target p cutoff
 #'
 #' Uses ROCR to calculate FPR vs p cutoff curve, then
 #' chooses loosest p looser than target_p
@@ -117,6 +117,67 @@ get_P_at_p = function(pred, target_p){
     ps = sapply(pred@cutoffs, function(X){ min(X[X > target_p])})
     return(ps)
 }
+
+#' Get TPR at target score cutoff
+#'
+#' Uses ROCR to calculate TPR vs score cutoff curve, then
+#' chooses largest TPR for scores stricter than given target score cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_s A target score
+#' @return A numeric vector of TPRs ordered like ROCR prediction columns
+#' @export
+get_TPR_at_s =function(pred, target_s){
+    perf = ROCR::performance(pred, 'tpr')
+    num_tprs = length(perf@y.values)
+    tprs = vector(mode = 'numeric', length = num_tprs)
+    for(i in 1:num_tprs){
+        w = tail(which(perf@x.values[[i]] > target_s), 1)
+        tprs[i] = perf@y.values[[i]][w]
+    }
+    return(tprs)
+}
+
+#' Get PPV at target score cutoff
+#'
+#' Uses ROCR to calculate PPV vs score cutoff curve, then
+#' chooses largest PPV for scores stricter than given target score cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_s A target score
+#' @return A numeric vector of PPVs ordered like ROCR prediction columns
+#' @export
+get_PPV_at_s =function(pred, target_s){
+    perf = ROCR::performance(pred, 'ppv')
+    num_ppvs = length(perf@y.values)
+    ppvs = vector(mode = 'numeric', length = num_ppvs)
+    for(i in 1:num_ppvs){
+        w = tail(which(perf@x.values[[i]] > target_s), 1)
+        ppvs[i] = perf@y.values[[i]][w]
+    }
+    return(ppvs)
+}
+
+#' Get FPR at target score cutoff
+#'
+#' Uses ROCR to calculate FPR vs score cutoff curve, then
+#' chooses largest FPR for scores stricter than given target score cutoff
+#'
+#' @param pred A ROCR prediction object
+#' @param target_s A target score
+#' @return A numeric vector of FPRs ordered like ROCR prediction columns
+#' @export
+get_FPR_at_s =function(pred, target_s){
+    perf = ROCR::performance(pred, 'fpr')
+    num_fprs = length(perf@y.values)
+    fprs = vector(mode = 'numeric', length = num_fprs)
+    for(i in 1:num_fprs){
+        w = tail(which(perf@x.values[[i]] > target_s), 1)
+        fprs[i] = perf@y.values[[i]][w]
+    }
+    return(fprs)
+}
+
 
 #' Get score cutoffs that control FPR below a given target rate.
 #'
