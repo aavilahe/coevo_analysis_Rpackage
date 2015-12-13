@@ -15,3 +15,14 @@ programs.
 - Get TPR and PPV at controlled FPR
 - Estimate *P<sub>normal</sub>* and *P<sub>empirical</sub>* as used in [Avila-Herrera
   & Pollard BMC Binf 2015](http://doi.org/10.1186/s12859-015-0677-y)
+
+## TODO
+
+- [x] Update readme
+- [ ] Better I/O with readr
+- [ ] Add postprocessing
+    - [ ] functions
+    - [ ] example data
+- [ ] Example scripts / vignette
+- [ ] Replace data.table with dplyr
+
