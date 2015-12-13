@@ -22,7 +22,7 @@ programs.
 - [ ] Better I/O with readr
 - [ ] Add postprocessing
     - [ ] functions
-    - [ ] example data
+    - [x] example data
 - [ ] Example scripts / vignette
 - [ ] Replace data.table with dplyr
 
